@@ -13627,7 +13627,7 @@ function Preview() {
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumbers.third && "*".repeat(cardNumbers.third.length) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumbers.fourth && "*".repeat(cardNumbers.fourth.length) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+    (expirationPeriod.month || expirationPeriod.year) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
       expirationPeriod.month,
       "/",
       expirationPeriod.year
