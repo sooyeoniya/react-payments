@@ -466,8 +466,8 @@ function requireReact_production() {
   react_production.use = function(usable) {
     return ReactSharedInternals.H.use(usable);
   };
-  react_production.useActionState = function(action, initialState, permalink) {
-    return ReactSharedInternals.H.useActionState(action, initialState, permalink);
+  react_production.useActionState = function(action, initialState2, permalink) {
+    return ReactSharedInternals.H.useActionState(action, initialState2, permalink);
   };
   react_production.useCallback = function(callback, deps) {
     return ReactSharedInternals.H.useCallback(callback, deps);
@@ -512,8 +512,8 @@ function requireReact_production() {
   react_production.useRef = function(initialValue) {
     return ReactSharedInternals.H.useRef(initialValue);
   };
-  react_production.useState = function(initialState) {
-    return ReactSharedInternals.H.useState(initialState);
+  react_production.useState = function(initialState2) {
+    return ReactSharedInternals.H.useState(initialState2);
   };
   react_production.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
     return ReactSharedInternals.H.useSyncExternalStore(
@@ -965,8 +965,8 @@ function requireReactDom_production() {
   reactDom_production.unstable_batchedUpdates = function(fn, a) {
     return fn(a);
   };
-  reactDom_production.useFormState = function(action, initialState, permalink) {
-    return ReactSharedInternals.H.useFormState(action, initialState, permalink);
+  reactDom_production.useFormState = function(action, initialState2, permalink) {
+    return ReactSharedInternals.H.useFormState(action, initialState2, permalink);
   };
   reactDom_production.useFormStatus = function() {
     return ReactSharedInternals.H.useHostTransitionStatus();
@@ -3819,11 +3819,11 @@ function requireReactDomClient_production() {
     var root2 = enqueueConcurrentRenderForLane(fiber, 2);
     null !== root2 && scheduleUpdateOnFiber(root2, fiber, 2);
   }
-  function mountStateImpl(initialState) {
+  function mountStateImpl(initialState2) {
     var hook = mountWorkInProgressHook();
-    if ("function" === typeof initialState) {
-      var initialStateInitializer = initialState;
-      initialState = initialStateInitializer();
+    if ("function" === typeof initialState2) {
+      var initialStateInitializer = initialState2;
+      initialState2 = initialStateInitializer();
       if (shouldDoubleInvokeUserFnsInHooksDEV) {
         setIsStrictModeForDevtools(true);
         try {
@@ -3833,13 +3833,13 @@ function requireReactDomClient_production() {
         }
       }
     }
-    hook.memoizedState = hook.baseState = initialState;
+    hook.memoizedState = hook.baseState = initialState2;
     hook.queue = {
       pending: null,
       lanes: 0,
       dispatch: null,
       lastRenderedReducer: basicStateReducer,
-      lastRenderedState: initialState
+      lastRenderedState: initialState2
     };
     return hook;
   }
@@ -4441,7 +4441,7 @@ function requireReactDomClient_production() {
     useReducer: function(reducer, initialArg, init) {
       var hook = mountWorkInProgressHook();
       if (void 0 !== init) {
-        var initialState = init(initialArg);
+        var initialState2 = init(initialArg);
         if (shouldDoubleInvokeUserFnsInHooksDEV) {
           setIsStrictModeForDevtools(true);
           try {
@@ -4450,14 +4450,14 @@ function requireReactDomClient_production() {
             setIsStrictModeForDevtools(false);
           }
         }
-      } else initialState = initialArg;
-      hook.memoizedState = hook.baseState = initialState;
+      } else initialState2 = initialArg;
+      hook.memoizedState = hook.baseState = initialState2;
       reducer = {
         pending: null,
         lanes: 0,
         dispatch: null,
         lastRenderedReducer: reducer,
-        lastRenderedState: initialState
+        lastRenderedState: initialState2
       };
       hook.queue = reducer;
       reducer = reducer.dispatch = dispatchReducerAction.bind(
@@ -4472,11 +4472,11 @@ function requireReactDomClient_production() {
       initialValue = { current: initialValue };
       return hook.memoizedState = initialValue;
     },
-    useState: function(initialState) {
-      initialState = mountStateImpl(initialState);
-      var queue = initialState.queue, dispatch = dispatchSetState.bind(null, currentlyRenderingFiber, queue);
+    useState: function(initialState2) {
+      initialState2 = mountStateImpl(initialState2);
+      var queue = initialState2.queue, dispatch = dispatchSetState.bind(null, currentlyRenderingFiber, queue);
       queue.dispatch = dispatch;
-      return [initialState.memoizedState, dispatch];
+      return [initialState2.memoizedState, dispatch];
     },
     useDebugValue: mountDebugValue,
     useDeferredValue: function(value, initialValue) {
@@ -12080,14 +12080,14 @@ function requireClient() {
 }
 var clientExports = requireClient();
 const ReactDOM = /* @__PURE__ */ getDefaultExportFromCjs(clientExports);
-const INPUT_TYPE = {
+const CARD_INPUT_TYPE = {
   cardNumbers: "cardNumbers",
   expirationPeriod: "expirationPeriod",
   cvcNumber: "cvcNumber"
 };
-const CARD_IMAGE = {
-  visa: "./visa.jpg",
-  mastercard: "./mastercard.jpg"
+const CARD_TYPE = {
+  visa: "visa",
+  master: "master"
 };
 const CARD_POSITION = {
   first: "first",
@@ -13239,26 +13239,30 @@ const ErrorCSS = dt.p`
   color: #ff3d3d;
 `;
 function Error$1({ errorMessage, isVisible }) {
-  return isVisible ? /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorCSS, { children: errorMessage }) : null;
+  return isVisible && /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorCSS, { children: errorMessage });
 }
-const defaultCardNumbers = {
-  first: "",
-  second: "",
-  third: "",
-  fourth: ""
+const initialState = {
+  cardNumbers: {
+    first: "",
+    second: "",
+    third: "",
+    fourth: ""
+  },
+  expirationPeriod: {
+    month: "",
+    year: ""
+  },
+  cvcNumber: ""
 };
-const defaultExpirationPeriod = {
-  month: "",
-  year: ""
-};
-const defaultCvcNumber = "";
 const CardContext = reactExports.createContext(null);
 function CardProvider({ children }) {
-  const [cardNumbers, setCardNumbers] = reactExports.useState(defaultCardNumbers);
-  const [expirationPeriod, setExpirationPeriod] = reactExports.useState(
-    defaultExpirationPeriod
+  const [cardNumbers, setCardNumbers] = reactExports.useState(
+    initialState.cardNumbers
   );
-  const [cvcNumber, setCvcNumber] = reactExports.useState(defaultCvcNumber);
+  const [expirationPeriod, setExpirationPeriod] = reactExports.useState(
+    initialState.expirationPeriod
+  );
+  const [cvcNumber, setCvcNumber] = reactExports.useState(initialState.cvcNumber);
   const updateCardNumber = (value, position2) => {
     setCardNumbers((prevNumbers) => ({
       ...prevNumbers,
@@ -13322,11 +13326,21 @@ function Input({
     }
   );
 }
-const InputGroupCSS = dt.div`
+const CardInputGroupCSS = dt.div`
   display: flex;
   gap: 8px;
 `;
-function InputGroup({
+const PLACEHOLDERS = {
+  cardNumber: "1234",
+  month: "MM",
+  cvcNumber: "123"
+};
+const MAX_LENGTHS = {
+  cardNumber: 4,
+  expirationPeriod: 2,
+  cvcNumber: 3
+};
+function CardInputGroup({
   type,
   error,
   setCardNumberError,
@@ -13355,88 +13369,48 @@ function InputGroup({
   };
   const renderInputByType = () => {
     switch (type) {
-      case INPUT_TYPE.cardNumbers:
-        const carNumberPlaceholder = "1234";
-        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+      case CARD_INPUT_TYPE.cardNumbers:
+        const cardPositions = [
+          CARD_POSITION.first,
+          CARD_POSITION.second,
+          CARD_POSITION.third,
+          CARD_POSITION.fourth
+        ];
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: cardPositions.map((position2) => {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(
             Input,
             {
-              placeholder: carNumberPlaceholder,
-              maxLength: 4,
-              isError: error.cardNumbers.first,
-              value: cardNumbers.first,
-              onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.first)
+              placeholder: PLACEHOLDERS.cardNumber,
+              maxLength: MAX_LENGTHS.cardNumber,
+              isError: error.cardNumbers[position2],
+              value: cardNumbers[position2],
+              onChange: (e) => handleCardNumberChange(e.target.value, position2)
             }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          );
+        }) });
+      case CARD_INPUT_TYPE.expirationPeriod:
+        const periodPositions = [
+          PERIOD_POSITION.month,
+          PERIOD_POSITION.year
+        ];
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: periodPositions.map((position2) => {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(
             Input,
             {
-              placeholder: carNumberPlaceholder,
-              maxLength: 4,
-              isError: error.cardNumbers.second,
-              value: cardNumbers.second,
-              onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.second)
+              placeholder: PLACEHOLDERS.month,
+              maxLength: MAX_LENGTHS.expirationPeriod,
+              isError: error.expirationPeriod[position2],
+              value: expirationPeriod[position2],
+              onChange: (e) => handleExpirationPeriodChange(e.target.value, position2)
             }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              placeholder: carNumberPlaceholder,
-              maxLength: 4,
-              isError: error.cardNumbers.third,
-              value: cardNumbers.third,
-              onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.third)
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              placeholder: carNumberPlaceholder,
-              maxLength: 4,
-              isError: error.cardNumbers.fourth,
-              value: cardNumbers.fourth,
-              onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.fourth)
-            }
-          )
-        ] });
-      case INPUT_TYPE.expirationPeriod:
-        const monthPlaceholder = "MM";
-        const yearPlaceholder = "YY";
-        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              placeholder: monthPlaceholder,
-              maxLength: 2,
-              isError: error.expirationPeriod.month,
-              value: expirationPeriod.month,
-              onChange: (e) => handleExpirationPeriodChange(
-                e.target.value,
-                PERIOD_POSITION.month
-              )
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              placeholder: yearPlaceholder,
-              maxLength: 2,
-              isError: error.expirationPeriod.year,
-              value: expirationPeriod.year,
-              onChange: (e) => handleExpirationPeriodChange(
-                e.target.value,
-                PERIOD_POSITION.year
-              )
-            }
-          )
-        ] });
-      case INPUT_TYPE.cvcNumber:
-        const cvcPlaceholder = "123";
+          );
+        }) });
+      case CARD_INPUT_TYPE.cvcNumber:
         return /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
-            placeholder: cvcPlaceholder,
-            maxLength: 3,
+            placeholder: PLACEHOLDERS.cvcNumber,
+            maxLength: MAX_LENGTHS.cvcNumber,
             isError: error.cvcNumber,
             value: cvcNumber,
             onChange: (e) => handleCvcNumberChange(e.target.value)
@@ -13444,7 +13418,7 @@ function InputGroup({
         );
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroupCSS, { children: renderInputByType() });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(CardInputGroupCSS, { children: renderInputByType() });
 }
 const SubtitleCSS = dt.p`
   margin: 0;
@@ -13459,6 +13433,9 @@ const TitleCSS = dt.h2`
 function Title({ title }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(TitleCSS, { children: title });
 }
+const isNotNumber = (value) => {
+  return Number.isNaN(Number(value));
+};
 const defaultError = {
   cardNumbers: {
     first: false,
@@ -13472,14 +13449,14 @@ const defaultError = {
   },
   cvcNumber: false
 };
-function useInputError() {
+function useCardInputError() {
   const [error, setError] = reactExports.useState(defaultError);
   const setCardNumberError = (value, position2) => {
     setError((prev2) => ({
       ...prev2,
       cardNumbers: {
         ...prev2.cardNumbers,
-        [position2]: Number.isNaN(Number(value))
+        [position2]: isNotNumber(value)
       }
     }));
   };
@@ -13488,14 +13465,14 @@ function useInputError() {
       ...prev2,
       expirationPeriod: {
         ...prev2.expirationPeriod,
-        [position2]: Number.isNaN(Number(value))
+        [position2]: isNotNumber(value)
       }
     }));
   };
   const setCvcNumberError = (value) => {
     setError((prev2) => ({
       ...prev2,
-      cvcNumber: Number.isNaN(Number(value))
+      cvcNumber: isNotNumber(value)
     }));
   };
   return {
@@ -13506,33 +13483,34 @@ function useInputError() {
   };
 }
 const titleVariants = {
-  [INPUT_TYPE.cardNumbers]: "결제할 카드 번호를 입력해 주세요",
-  [INPUT_TYPE.expirationPeriod]: "카드 유효기간을 입력해 주세요",
-  [INPUT_TYPE.cvcNumber]: "CVC 번호를 입력해 주세요"
+  [CARD_INPUT_TYPE.cardNumbers]: "결제할 카드 번호를 입력해 주세요",
+  [CARD_INPUT_TYPE.expirationPeriod]: "카드 유효기간을 입력해 주세요",
+  [CARD_INPUT_TYPE.cvcNumber]: "CVC 번호를 입력해 주세요"
 };
 const descriptionVariants = {
-  [INPUT_TYPE.cardNumbers]: "본인 명의의 카드만 결제 가능합니다.",
-  [INPUT_TYPE.expirationPeriod]: "월/년도(MMYY)를 순서대로 입력해 주세요.",
-  [INPUT_TYPE.cvcNumber]: null
+  [CARD_INPUT_TYPE.cardNumbers]: "본인 명의의 카드만 결제 가능합니다.",
+  [CARD_INPUT_TYPE.expirationPeriod]: "월/년도(MMYY)를 순서대로 입력해 주세요.",
+  [CARD_INPUT_TYPE.cvcNumber]: null
 };
-const subTitleVariants = {
-  [INPUT_TYPE.cardNumbers]: "카드 번호",
-  [INPUT_TYPE.expirationPeriod]: "유효기간",
-  [INPUT_TYPE.cvcNumber]: "CVC"
+const subtitleVariants = {
+  [CARD_INPUT_TYPE.cardNumbers]: "카드 번호",
+  [CARD_INPUT_TYPE.expirationPeriod]: "유효기간",
+  [CARD_INPUT_TYPE.cvcNumber]: "CVC"
 };
-function InputForm({ type }) {
+function CardInputSection({ type }) {
   const {
     error,
     setCardNumberError,
     setExpirationPeriodError,
     setCvcNumberError
-  } = useInputError();
+  } = useCardInputError();
+  const isErrorVisible = type === CARD_INPUT_TYPE.cvcNumber ? error[type] : Object.values(error[type] ?? {}).some((v2) => v2);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Title, { title: titleVariants[type] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Description, { description: descriptionVariants[type] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Subtitle, { subtitle: subTitleVariants[type] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Subtitle, { subtitle: subtitleVariants[type] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
-      InputGroup,
+      CardInputGroup,
       {
         type,
         error,
@@ -13545,21 +13523,64 @@ function InputForm({ type }) {
       Error$1,
       {
         errorMessage: "숫자만 입력 가능합니다.",
-        isVisible: type === INPUT_TYPE.cvcNumber ? error[type] : Object.values(error[type] ?? {}).some((value) => value)
+        isVisible: isErrorVisible
       }
     )
   ] });
 }
-const PreviewImg = "/react-payments/card-preview.jpg";
-const PreviewContainerCSS = dt.div`
+const CARD_CONSTANTS = {
+  COMPLETE_CARD_NUMBER_LENGTH: 16,
+  VISA: {
+    FIRST_DIGIT: "4"
+  },
+  MASTER: {
+    FIRST_DIGIT: "5",
+    SECOND_DIGIT_MIN: "1",
+    SECOND_DIGIT_MAX: "5"
+  }
+};
+function parseCardNumbers(cardNumbers) {
+  return Object.values(cardNumbers).reduce(
+    (acc, cardNumber) => acc + cardNumber,
+    ""
+  );
+}
+function identifyCardType(parsedCardNumbers) {
+  const isIncompleteCardNumber = parsedCardNumbers.length !== CARD_CONSTANTS.COMPLETE_CARD_NUMBER_LENGTH;
+  if (isIncompleteCardNumber) return null;
+  const firstNumber = parsedCardNumbers[0];
+  const secondNumber = parsedCardNumbers[1];
+  const isVisaCard = firstNumber === CARD_CONSTANTS.VISA.FIRST_DIGIT;
+  const isMasterCardFirstDigitMatch = firstNumber === CARD_CONSTANTS.MASTER.FIRST_DIGIT;
+  const isSecondDigitInMasterCardRange = secondNumber >= CARD_CONSTANTS.MASTER.SECOND_DIGIT_MIN && secondNumber <= CARD_CONSTANTS.MASTER.SECOND_DIGIT_MAX;
+  const isMasterCard = isMasterCardFirstDigitMatch && isSecondDigitInMasterCardRange;
+  if (isVisaCard) return CARD_TYPE.visa;
+  if (isMasterCard) return CARD_TYPE.master;
+  return null;
+}
+function useCardType(cardNumbers) {
+  const [cardType, setCardType] = reactExports.useState(null);
+  reactExports.useEffect(() => {
+    const parsedCardNumbers = parseCardNumbers(cardNumbers);
+    const identifiedCardType = identifyCardType(parsedCardNumbers);
+    setCardType(identifiedCardType);
+  }, [cardNumbers]);
+  return cardType;
+}
+const CardPreviewImg = "/react-payments/card-preview.jpg";
+const CARD_IMAGE = {
+  [CARD_TYPE.visa]: "./visa.jpg",
+  [CARD_TYPE.master]: "./master.jpg"
+};
+const CardPreviewContainerCSS = dt.div`
   width: 100%;
   height: 180px;
   display: flex;
   justify-content: center;
   padding-bottom: 30px;
 `;
-const PreviewCSS = dt.div`
-  background: no-repeat center url(${PreviewImg});
+const CardPreviewCSS = dt.div`
+  background: no-repeat center url(${CardPreviewImg});
   background-size: cover;
   width: 230px;
   height: 180px;
@@ -13589,38 +13610,11 @@ const CardTypeCSS = dt.div`
   right: 25px;
   top: 10px;
 `;
-function Preview() {
-  const [cardImageType, setCardImageType] = reactExports.useState(
-    null
-  );
+function CardPreview() {
   const { cardNumbers, expirationPeriod } = useCard();
-  reactExports.useEffect(() => {
-    const parsedCardNumbers = parsingCardNumbers();
-    checkCardType(parsedCardNumbers);
-  }, [cardNumbers]);
-  const parsingCardNumbers = () => {
-    return Object.values(cardNumbers).reduce(
-      (acc, cardNumber) => acc + cardNumber,
-      ""
-    );
-  };
-  const checkCardType = (parsedCardNumbers) => {
-    if (parsedCardNumbers.length !== 16) {
-      setCardImageType(null);
-      return;
-    }
-    const firstNumber = parsedCardNumbers[0];
-    const secondNumber = parsedCardNumbers[1];
-    if (firstNumber === "4") {
-      setCardImageType("visa");
-    } else if (firstNumber === "5" && secondNumber >= "1" && secondNumber <= "5") {
-      setCardImageType("mastercard");
-    } else {
-      setCardImageType(null);
-    }
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(PreviewContainerCSS, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(PreviewCSS, { children: [
-    cardImageType !== null && /* @__PURE__ */ jsxRuntimeExports.jsx(CardTypeCSS, { $cardType: cardImageType }),
+  const cardType = useCardType(cardNumbers);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(CardPreviewContainerCSS, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardPreviewCSS, { children: [
+    cardType !== null && /* @__PURE__ */ jsxRuntimeExports.jsx(CardTypeCSS, { $cardType: cardType }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardNumbersGroupCSS, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumbers.first }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumbers.second }),
@@ -13634,7 +13628,7 @@ function Preview() {
     ] })
   ] }) });
 }
-const PaymentsCSS = dt.div`
+const CardPaymentsPageCSS = dt.div`
   margin: 0 auto;
   height: 100vh;
   width: 30%;
@@ -13642,14 +13636,14 @@ const PaymentsCSS = dt.div`
   flex-direction: column;
   justify-content: center;
 `;
-function Payments() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(PaymentsCSS, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Preview, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(InputForm, { type: INPUT_TYPE.cardNumbers }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(InputForm, { type: INPUT_TYPE.expirationPeriod }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(InputForm, { type: INPUT_TYPE.cvcNumber })
+function CardPaymentsPage() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(CardPaymentsPageCSS, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardPreview, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardInputSection, { type: CARD_INPUT_TYPE.cardNumbers }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardInputSection, { type: CARD_INPUT_TYPE.expirationPeriod }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardInputSection, { type: CARD_INPUT_TYPE.cvcNumber })
   ] });
 }
 ReactDOM.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Payments, {}) }) })
+  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardPaymentsPage, {}) }) })
 );
