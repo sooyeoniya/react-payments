@@ -19054,7 +19054,7 @@ function RegisterComplete() {
   const { state } = useLocation();
   const { cardFirstSegment, cardName } = state || {};
   const handleConfirm = () => {
-    window.location.href = basePath;
+    window.location.href = `${window.location.origin}${basePath}`;
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(RegisterCompleteStyles, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CheckImgStyles, { src: "./check.svg", alt: "check" }),
