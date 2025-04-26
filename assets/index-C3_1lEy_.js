@@ -17448,7 +17448,7 @@ function createBrowserRouter(routes, opts) {
     unstable_getContext: opts == null ? void 0 : opts.unstable_getContext,
     future: opts == null ? void 0 : opts.future,
     history: createBrowserHistory({ window: opts == null ? void 0 : opts.window }),
-    hydrationData: parseHydrationData(),
+    hydrationData: (opts == null ? void 0 : opts.hydrationData) || parseHydrationData(),
     routes,
     mapRouteProperties,
     hydrationRouteProperties,
@@ -20005,25 +20005,31 @@ const GlobalStyles = ft`
     padding: 0;
   }
 `;
+const basePath = "/react-payments";
 function Layout() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ContainerStyles, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(WrapperStyles, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardValidationProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Outlet, {}) }) }) }) });
 }
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, {}),
+      children: [
+        {
+          path: "/",
+          element: /* @__PURE__ */ jsxRuntimeExports.jsx(CardForm, {})
+        },
+        {
+          path: "/register-complete",
+          element: /* @__PURE__ */ jsxRuntimeExports.jsx(RegisterComplete, {})
+        }
+      ]
+    }
+  ],
   {
-    path: "/",
-    element: /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, {}),
-    children: [
-      {
-        path: "/",
-        element: /* @__PURE__ */ jsxRuntimeExports.jsx(CardForm, {})
-      },
-      {
-        path: "/register-complete",
-        element: /* @__PURE__ */ jsxRuntimeExports.jsx(RegisterComplete, {})
-      }
-    ]
+    basename: basePath
   }
-]);
+);
 ReactDOM.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ jsxRuntimeExports.jsxs(React.StrictMode, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(GlobalStyles, {}),
