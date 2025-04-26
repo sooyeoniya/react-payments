@@ -19049,11 +19049,12 @@ const CompletionTitleStyles = dt.h1`
   margin: 0;
   padding: 0;
 `;
+const basePath = "/react-payments";
 function RegisterComplete() {
   const { state } = useLocation();
   const { cardFirstSegment, cardName } = state || {};
   const handleConfirm = () => {
-    window.location.href = "/";
+    window.location.href = basePath;
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(RegisterCompleteStyles, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CheckImgStyles, { src: "./check.svg", alt: "check" }),
@@ -20005,7 +20006,6 @@ const GlobalStyles = ft`
     padding: 0;
   }
 `;
-const basePath = "/react-payments";
 function Layout() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ContainerStyles, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(WrapperStyles, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardValidationProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Outlet, {}) }) }) }) });
 }
