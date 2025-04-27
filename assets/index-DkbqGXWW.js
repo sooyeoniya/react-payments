@@ -17852,6 +17852,386 @@ var reactDomExports = requireReactDom();
 function RouterProvider2(props) {
   return /* @__PURE__ */ reactExports.createElement(RouterProvider, { flushSync: reactDomExports.flushSync, ...props });
 }
+const basePath = "/react-payments";
+const CARD_FORM_TYPE = {
+  cardNumber: "cardNumber",
+  expirationPeriod: "expirationPeriod",
+  cvcNumber: "cvcNumber",
+  cardCompany: "cardCompany",
+  password: "password"
+};
+const CARD_NUMBERS_SEGMENT = {
+  first: "first",
+  second: "second",
+  third: "third",
+  fourth: "fourth"
+};
+const EXPIRATION_PERIOD_SEGMENT = {
+  month: "month",
+  year: "year"
+};
+const CARD_TYPE = {
+  visa: "visa",
+  master: "master"
+};
+const CARD_COMPANY = {
+  none: "",
+  bc: "bc",
+  shinhan: "shinhan",
+  kakaobank: "kakaobank",
+  hyundai: "hyundai",
+  woori: "woori",
+  lotte: "lotte",
+  hana: "hana",
+  kb: "kb"
+};
+const CARD_COMPANY_INFO = [
+  { value: "bc", text: "BC카드" },
+  { value: "shinhan", text: "신한카드" },
+  { value: "kakaobank", text: "카카오뱅크" },
+  { value: "hyundai", text: "현대카드" },
+  { value: "woori", text: "우리카드" },
+  { value: "lotte", text: "롯데카드" },
+  { value: "hana", text: "하나카드" },
+  { value: "kb", text: "국민카드" }
+];
+const PLACEHOLDER = {
+  cardNumber: "1234",
+  expirationPeriod: {
+    month: "MM",
+    year: "YY"
+  },
+  cvcNumber: "123",
+  cardCompany: "카드사를 선택해 주세요",
+  password: "비밀번호를 입력해 주세요"
+};
+const MAX_LENGTH = {
+  cardNumber: 4,
+  expirationPeriod: 2,
+  cvcNumber: 3,
+  password: 2
+};
+const isPositiveInteger = (value) => {
+  return /^\d*$/.test(value);
+};
+const isEmpty = (value) => {
+  return value === "";
+};
+const hasExactLength = (value, expectedLength) => {
+  return value.length === expectedLength;
+};
+const isCardNumberFilled = (cardNumber) => {
+  return Object.values(cardNumber).every(
+    (segment) => hasExactLength(segment, MAX_LENGTH.cardNumber)
+  );
+};
+const isCardCompanySelected = (cardCompany) => {
+  return cardCompany !== CARD_COMPANY.none;
+};
+const isExpirationPeriodFilled = (expirationPeriod) => {
+  return Object.values(expirationPeriod).every(
+    (segment) => hasExactLength(segment, MAX_LENGTH.expirationPeriod)
+  );
+};
+const isCvcNumberFilled = (value) => {
+  return hasExactLength(value, MAX_LENGTH.cvcNumber);
+};
+const isPasswordFilled = (value) => {
+  return hasExactLength(value, MAX_LENGTH.password);
+};
+const initialState$1 = {
+  cardNumber: {
+    first: "",
+    second: "",
+    third: "",
+    fourth: ""
+  },
+  expirationPeriod: {
+    month: "",
+    year: ""
+  },
+  cvcNumber: "",
+  cardCompany: CARD_COMPANY.none,
+  password: ""
+};
+const CardContext = reactExports.createContext(null);
+function CardProvider({ children }) {
+  const [cardNumber, setCardNumber] = reactExports.useState(
+    initialState$1.cardNumber
+  );
+  const [expirationPeriod, setExpirationPeriod] = reactExports.useState(initialState$1.expirationPeriod);
+  const [cvcNumber, setCvcNumber] = reactExports.useState(
+    initialState$1.cvcNumber
+  );
+  const [cardCompany, setCardCompany] = reactExports.useState(
+    initialState$1.cardCompany
+  );
+  const [password, setPassword] = reactExports.useState(
+    initialState$1.password
+  );
+  const updateCardNumber = (value, position2) => {
+    setCardNumber((prevCardNumber) => ({
+      ...prevCardNumber,
+      [position2]: value
+    }));
+  };
+  const updateExpirationPeriod = (value, position2) => {
+    setExpirationPeriod((prevExpirationPeriod) => ({
+      ...prevExpirationPeriod,
+      [position2]: value
+    }));
+  };
+  const isFieldFilled = (type) => {
+    switch (type) {
+      case CARD_FORM_TYPE.cardNumber:
+        return isCardNumberFilled(cardNumber);
+      case CARD_FORM_TYPE.expirationPeriod:
+        return isExpirationPeriodFilled(expirationPeriod);
+      case CARD_FORM_TYPE.cvcNumber:
+        return isCvcNumberFilled(cvcNumber);
+      case CARD_FORM_TYPE.cardCompany:
+        return isCardCompanySelected(cardCompany);
+      case CARD_FORM_TYPE.password:
+        return isPasswordFilled(password);
+      default:
+        return false;
+    }
+  };
+  const areAllFieldsFilled = () => {
+    return Object.values(CARD_FORM_TYPE).every((type) => isFieldFilled(type));
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    CardContext.Provider,
+    {
+      value: {
+        cardNumber,
+        updateCardNumber,
+        expirationPeriod,
+        updateExpirationPeriod,
+        cvcNumber,
+        updateCvcNumber: setCvcNumber,
+        cardCompany,
+        updateCardCompany: setCardCompany,
+        password,
+        updatePassword: setPassword,
+        isFieldFilled,
+        areAllFieldsFilled
+      },
+      children
+    }
+  );
+}
+const updateSimpleErrorState = (errorMessage) => {
+  return {
+    errorMessage,
+    hasError: !!errorMessage
+  };
+};
+const updateMultiFieldErrorState = (errorMessage, position2, prevErrorState) => {
+  const newHasError = {
+    ...prevErrorState.hasError,
+    [position2]: !!errorMessage
+  };
+  const hasAnyError = Object.values(newHasError).some(Boolean);
+  const finalErrorMessage = errorMessage || (hasAnyError ? prevErrorState.errorMessage : null);
+  return {
+    errorMessage: finalErrorMessage,
+    hasError: newHasError
+  };
+};
+const ERROR_MESSAGES = {
+  NUMBER: "숫자만 입력 가능합니다",
+  INVALID_MONTH: "유효한 월(MM)을 입력해 주세요. (01~12)",
+  INVALID_YEAR: "현재 연도 이상의 유효한 연도(YY)을 입력해 주세요.",
+  CHOOSE_CARD_COMPANY: "카드사를 하나 선택해주세요",
+  FILL_CARD_NUMBER: "카드 번호를 모두 입력해 주세요",
+  FILL_DATE: "유효 기간을 모두 입력해 주세요",
+  FILL_CVC: "CVC 번호를 모두 입력해 주세요",
+  FILL_PASSWORD: "비밀번호를 모두 입력해 주세요"
+};
+const isErrorCardNumber = (value) => {
+  if (!isPositiveInteger(value)) return ERROR_MESSAGES.NUMBER;
+  if (!hasExactLength(value, MAX_LENGTH.cardNumber)) {
+    return ERROR_MESSAGES.FILL_CARD_NUMBER;
+  }
+  return null;
+};
+const isErrorCardCompany = (value) => {
+  if (isEmpty(value)) return ERROR_MESSAGES.CHOOSE_CARD_COMPANY;
+  return null;
+};
+const validateMonth = (value) => {
+  const monthNumber = parseInt(value, 10);
+  if (isNaN(monthNumber) || monthNumber < 1 || monthNumber > 12) {
+    return ERROR_MESSAGES.INVALID_MONTH;
+  }
+  return null;
+};
+const validateYear = (value) => {
+  const yearNumber = parseInt(value, 10);
+  const currentYear = (/* @__PURE__ */ new Date()).getFullYear() % 100;
+  if (isNaN(yearNumber) || yearNumber < currentYear) {
+    return ERROR_MESSAGES.INVALID_YEAR;
+  }
+  return null;
+};
+const isErrorExpirationPeriod = (value, position2) => {
+  if (!isPositiveInteger(value)) return ERROR_MESSAGES.NUMBER;
+  if (!hasExactLength(value, MAX_LENGTH.expirationPeriod)) {
+    return ERROR_MESSAGES.FILL_DATE;
+  }
+  switch (position2) {
+    case EXPIRATION_PERIOD_SEGMENT.month:
+      return validateMonth(value);
+    case EXPIRATION_PERIOD_SEGMENT.year:
+      return validateYear(value);
+    default:
+      return null;
+  }
+};
+const isErrorCvcNumber = (value) => {
+  if (!isPositiveInteger(value)) return ERROR_MESSAGES.NUMBER;
+  if (!hasExactLength(value, MAX_LENGTH.cvcNumber)) {
+    return ERROR_MESSAGES.FILL_CVC;
+  }
+  return null;
+};
+const isErrorPassword = (value) => {
+  if (!isPositiveInteger(value)) return ERROR_MESSAGES.NUMBER;
+  if (!hasExactLength(value, MAX_LENGTH.password)) {
+    return ERROR_MESSAGES.FILL_PASSWORD;
+  }
+  return null;
+};
+const initialCardNumberState = {
+  errorMessage: null,
+  hasError: {
+    first: false,
+    second: false,
+    third: false,
+    fourth: false
+  }
+};
+const initialExpirationPeriodState = {
+  errorMessage: null,
+  hasError: {
+    month: false,
+    year: false
+  }
+};
+const initialCommonState = {
+  errorMessage: null,
+  hasError: false
+};
+const CardValidationContext = reactExports.createContext(null);
+function CardValidationProvider({ children }) {
+  const [cardNumberError, setCardNumberError] = reactExports.useState(
+    initialCardNumberState
+  );
+  const [expirationPeriodError, setExpirationPeriodError] = reactExports.useState(initialExpirationPeriodState);
+  const [cvcNumberError, setCvcNumberError] = reactExports.useState(initialCommonState);
+  const [cardCompanyError, setCardCompanyError] = reactExports.useState(initialCommonState);
+  const [passwordError, setPasswordError] = reactExports.useState(initialCommonState);
+  const validateCardNumber = (value, position2) => {
+    const errorMessage = isErrorCardNumber(value);
+    setCardNumberError(
+      (prev2) => updateMultiFieldErrorState(
+        errorMessage,
+        position2,
+        prev2
+      )
+    );
+  };
+  const validateExpirationPeriod = (value, position2) => {
+    const errorMessage = isErrorExpirationPeriod(value, position2);
+    setExpirationPeriodError(
+      (prev2) => updateMultiFieldErrorState(
+        errorMessage,
+        position2,
+        prev2
+      )
+    );
+  };
+  const validateCvcNumber = (value) => {
+    const errorMessage = isErrorCvcNumber(value);
+    setCvcNumberError(updateSimpleErrorState(errorMessage));
+  };
+  const validateCardCompany = (value) => {
+    const errorMessage = isErrorCardCompany(value);
+    setCardCompanyError(updateSimpleErrorState(errorMessage));
+  };
+  const validatePassword = (value) => {
+    const errorMessage = isErrorPassword(value);
+    setPasswordError(updateSimpleErrorState(errorMessage));
+  };
+  const hasErrorByType = (type) => {
+    switch (type) {
+      case CARD_FORM_TYPE.cardNumber:
+        return Object.values(cardNumberError.hasError).some((state) => state);
+      case CARD_FORM_TYPE.expirationPeriod:
+        return Object.values(expirationPeriodError.hasError).some(
+          (state) => state
+        );
+      case CARD_FORM_TYPE.cvcNumber:
+        return cvcNumberError.hasError;
+      case CARD_FORM_TYPE.cardCompany:
+        return cardCompanyError.hasError;
+      case CARD_FORM_TYPE.password:
+        return passwordError.hasError;
+      default:
+        return false;
+    }
+  };
+  const getErrorMessage = (type) => {
+    switch (type) {
+      case CARD_FORM_TYPE.cardNumber:
+        return cardNumberError.errorMessage;
+      case CARD_FORM_TYPE.expirationPeriod:
+        return expirationPeriodError.errorMessage;
+      case CARD_FORM_TYPE.cvcNumber:
+        return cvcNumberError.errorMessage;
+      case CARD_FORM_TYPE.cardCompany:
+        return cardCompanyError.errorMessage;
+      case CARD_FORM_TYPE.password:
+        return passwordError.errorMessage;
+      default:
+        return null;
+    }
+  };
+  const areAllFieldsValid = () => {
+    return Object.values(CARD_FORM_TYPE).every((type) => !hasErrorByType(type));
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    CardValidationContext.Provider,
+    {
+      value: {
+        cardNumberError,
+        expirationPeriodError,
+        cvcNumberError,
+        cardCompanyError,
+        passwordError,
+        validateCardNumber,
+        validateExpirationPeriod,
+        validateCvcNumber,
+        validateCardCompany,
+        validatePassword,
+        hasErrorByType,
+        getErrorMessage,
+        areAllFieldsValid
+      },
+      children
+    }
+  );
+}
+const useCardValidation = () => {
+  const context = reactExports.useContext(CardValidationContext);
+  if (context === null) {
+    throw new Error(
+      "CardValidationContext must be used within a CardValidationProvider"
+    );
+  }
+  return context;
+};
 var __assign = function() {
   __assign = Object.assign || function __assign2(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -19011,365 +19391,6 @@ function ft(n2) {
   }
   return React.memo(l2);
 }
-const ButtonStyles = dt.button`
-  width: 100%;
-  height: 55px;
-  background-color: #333333;
-  border-radius: 10px;
-  color: #ffffff;
-  cursor: pointer;
-  font-size: 18px;
-  transition: all 0.2s ease-out;
-
-  &:hover {
-    transform: scale(1.01);
-  }
-`;
-function Button({ text = "버튼", ...props }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonStyles, { ...props, children: text });
-}
-const RegisterCompleteStyles = dt.div`
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-`;
-const CheckImgStyles = dt.img`
-  width: 100px;
-  height: 100px;
-`;
-const CompletionMessageStyles = dt.div`
-  text-align: center;
-  line-height: 1.5;
-`;
-const CompletionTitleStyles = dt.h1`
-  margin: 0;
-  padding: 0;
-`;
-const basePath = "/react-payments";
-function RegisterComplete() {
-  const { state } = useLocation();
-  const { cardFirstSegment, cardName } = state || {};
-  const handleConfirm = () => {
-    window.location.href = `${window.location.origin}${basePath}`;
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(RegisterCompleteStyles, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(CheckImgStyles, { src: "./check.svg", alt: "check" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(CompletionMessageStyles, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(CompletionTitleStyles, { children: [
-        cardFirstSegment,
-        "로 시작하는"
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(CompletionTitleStyles, { children: [
-        cardName,
-        "가 등록되었어요."
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", text: "확인", onClick: handleConfirm })
-  ] });
-}
-const ContainerStyles = dt.div`
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f7f7f7;
-`;
-const WrapperStyles = dt.div`
-  display: flex;
-  flex-direction: column;
-  width: 28%;
-  height: 800px;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 10px;
-`;
-const CARD_FORM_TYPE = {
-  cardNumbers: "cardNumbers",
-  expirationPeriod: "expirationPeriod",
-  cvcNumber: "cvcNumber",
-  cardCompany: "cardCompany",
-  password: "password"
-};
-const CARD_TYPE = {
-  visa: "visa",
-  master: "master"
-};
-const CARD_NUMBERS_SEGMENT = {
-  first: "first",
-  second: "second",
-  third: "third",
-  fourth: "fourth"
-};
-const EXPIRATION_PERIOD_SEGMENT = {
-  month: "month",
-  year: "year"
-};
-const CARD_COMPANY = {
-  none: "",
-  bc: "bc",
-  shinhan: "shinhan",
-  kakaobank: "kakaobank",
-  hyundai: "hyundai",
-  woori: "woori",
-  lotte: "lotte",
-  hana: "hana",
-  kb: "kb"
-};
-const CARD_COMPANY_INFO$1 = [
-  { value: "bc", text: "BC카드" },
-  { value: "shinhan", text: "신한카드" },
-  { value: "kakaobank", text: "카카오뱅크" },
-  { value: "hyundai", text: "현대카드" },
-  { value: "woori", text: "우리카드" },
-  { value: "lotte", text: "롯데카드" },
-  { value: "hana", text: "하나카드" },
-  { value: "kb", text: "국민카드" }
-];
-const PLACEHOLDER$1 = {
-  cardNumber: "1234",
-  expirationPeriod: {
-    month: "MM",
-    year: "YY"
-  },
-  cvcNumber: "123",
-  password: "비밀번호를 입력해 주세요"
-};
-const MAX_LENGTH = {
-  cardNumber: 4,
-  expirationPeriod: 2,
-  cvcNumber: 3,
-  password: 2
-};
-const isPositiveInteger = (value) => {
-  return /^\d*$/.test(value);
-};
-const isEmpty = (value) => {
-  return value === "";
-};
-const hasExactLength = (value, expectedLength) => {
-  return value.length === expectedLength;
-};
-const isErrorCardCompany = (value) => {
-  if (isEmpty(value)) return "카드사를 하나 선택해주세요";
-  return null;
-};
-const isCardCompanySelected = (cardCompany) => {
-  return cardCompany !== CARD_COMPANY.none;
-};
-const isErrorCardNumber = (value) => {
-  if (!isPositiveInteger(value)) return "숫자만 입력 가능합니다";
-  if (!hasExactLength(value, MAX_LENGTH.cardNumber))
-    return "카드 번호를 모두 입력해 주세요";
-  return null;
-};
-const isCardNumberFilled = (cardNumbers) => {
-  return Object.values(cardNumbers).every(
-    (segment) => hasExactLength(segment, MAX_LENGTH.cardNumber)
-  );
-};
-const isErrorCvcNumber = (value) => {
-  if (!isPositiveInteger(value)) return "숫자만 입력 가능합니다";
-  if (!hasExactLength(value, MAX_LENGTH.cvcNumber))
-    return "CVC 번호를 모두 입력해 주세요";
-  return null;
-};
-const isCvcNumberFilled = (value) => {
-  return hasExactLength(value, MAX_LENGTH.cvcNumber);
-};
-const validateMonth = (value) => {
-  const monthNumber = parseInt(value, 10);
-  if (isNaN(monthNumber) || monthNumber < 1 || monthNumber > 12) {
-    return "유효한 날짜를 입력해 주세요";
-  }
-  return null;
-};
-const validateYear = (value) => {
-  const yearNumber = parseInt(value, 10);
-  const currentYear = (/* @__PURE__ */ new Date()).getFullYear() % 100;
-  if (isNaN(yearNumber) || yearNumber < currentYear) {
-    return "유효한 날짜를 입력해 주세요";
-  }
-  return null;
-};
-const isErrorExpirationPeriod = (value, position2) => {
-  if (!isPositiveInteger(value)) return "숫자만 입력 가능합니다";
-  if (!hasExactLength(value, MAX_LENGTH.expirationPeriod))
-    return "유효 기간을 모두 입력해 주세요";
-  switch (position2) {
-    case EXPIRATION_PERIOD_SEGMENT.month:
-      return validateMonth(value);
-    case EXPIRATION_PERIOD_SEGMENT.year:
-      return validateYear(value);
-    default:
-      return null;
-  }
-};
-const isExpirationPeriodFilled = (expirationPeriod) => {
-  return Object.values(expirationPeriod).every(
-    (segment) => hasExactLength(segment, MAX_LENGTH.expirationPeriod)
-  );
-};
-const isErrorPassword = (value) => {
-  if (!isPositiveInteger(value)) return "숫자만 입력 가능합니다";
-  if (!hasExactLength(value, MAX_LENGTH.password))
-    return "비밀번호를 모두 입력해 주세요";
-  return null;
-};
-const isPasswordFilled = (value) => {
-  return hasExactLength(value, MAX_LENGTH.password);
-};
-const initialCardNumbersState = {
-  errorMessage: null,
-  hasError: {
-    first: false,
-    second: false,
-    third: false,
-    fourth: false
-  }
-};
-const initialExpirationPeriodState = {
-  errorMessage: null,
-  hasError: {
-    month: false,
-    year: false
-  }
-};
-const initialCommonState = {
-  errorMessage: null,
-  hasError: false
-};
-const CardValidationContext = reactExports.createContext(null);
-function CardValidationProvider({ children }) {
-  const [cardNumberErrors, setCardNumberErrors] = reactExports.useState(initialCardNumbersState);
-  const [expirationPeriodErrors, setExpirationPeriodErrors] = reactExports.useState(initialExpirationPeriodState);
-  const [cvcNumberError, setCvcNumberError] = reactExports.useState(initialCommonState);
-  const [cardCompanyError, setCardCompanyError] = reactExports.useState(initialCommonState);
-  const [passwordError, setPasswordError] = reactExports.useState(initialCommonState);
-  const validateCardNumber = (value, position2) => {
-    const errorMessage = isErrorCardNumber(value);
-    setCardNumberErrors((prev2) => {
-      const newHasError = {
-        ...prev2.hasError,
-        [position2]: !!errorMessage
-      };
-      const hasAnyError = Object.values(newHasError).some(Boolean);
-      const finalErrorMessage = errorMessage || (hasAnyError ? prev2.errorMessage : null);
-      return {
-        errorMessage: finalErrorMessage,
-        hasError: newHasError
-      };
-    });
-  };
-  const validateExpirationPeriod = (value, position2) => {
-    const errorMessage = isErrorExpirationPeriod(value, position2);
-    setExpirationPeriodErrors((prev2) => {
-      const newHasError = {
-        ...prev2.hasError,
-        [position2]: !!errorMessage
-      };
-      const hasAnyError = Object.values(newHasError).some(Boolean);
-      const finalErrorMessage = errorMessage || (hasAnyError ? prev2.errorMessage : null);
-      return {
-        errorMessage: finalErrorMessage,
-        hasError: newHasError
-      };
-    });
-  };
-  const validateCvcNumber = (value) => {
-    const errorMessage = isErrorCvcNumber(value);
-    setCvcNumberError({
-      errorMessage,
-      hasError: !!errorMessage
-    });
-  };
-  const validateCardCompany = (value) => {
-    const errorMessage = isErrorCardCompany(value);
-    setCardCompanyError({
-      errorMessage,
-      hasError: !!errorMessage
-    });
-  };
-  const validatePassword = (value) => {
-    const errorMessage = isErrorPassword(value);
-    setPasswordError({
-      errorMessage,
-      hasError: !!errorMessage
-    });
-  };
-  const hasErrorByType = (type) => {
-    switch (type) {
-      case CARD_FORM_TYPE.cardNumbers:
-        return Object.values(cardNumberErrors.hasError).some((state) => state);
-      case CARD_FORM_TYPE.expirationPeriod:
-        return Object.values(expirationPeriodErrors.hasError).some(
-          (state) => state
-        );
-      case CARD_FORM_TYPE.cvcNumber:
-        return cvcNumberError.hasError;
-      case CARD_FORM_TYPE.cardCompany:
-        return cardCompanyError.hasError;
-      case CARD_FORM_TYPE.password:
-        return passwordError.hasError;
-      default:
-        return false;
-    }
-  };
-  const getErrorMessage = (type) => {
-    switch (type) {
-      case CARD_FORM_TYPE.cardNumbers:
-        return cardNumberErrors.errorMessage;
-      case CARD_FORM_TYPE.expirationPeriod:
-        return expirationPeriodErrors.errorMessage;
-      case CARD_FORM_TYPE.cvcNumber:
-        return cvcNumberError.errorMessage;
-      case CARD_FORM_TYPE.cardCompany:
-        return cardCompanyError.errorMessage;
-      case CARD_FORM_TYPE.password:
-        return passwordError.errorMessage;
-      default:
-        return null;
-    }
-  };
-  const areAllFieldsValid = () => {
-    return Object.values(CARD_FORM_TYPE).every((type) => !hasErrorByType(type));
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    CardValidationContext.Provider,
-    {
-      value: {
-        cardNumberErrors,
-        expirationPeriodErrors,
-        cvcNumberError,
-        cardCompanyError,
-        passwordError,
-        validateCardNumber,
-        validateExpirationPeriod,
-        validateCvcNumber,
-        validateCardCompany,
-        validatePassword,
-        hasErrorByType,
-        getErrorMessage,
-        areAllFieldsValid
-      },
-      children
-    }
-  );
-}
-const useCardValidation = () => {
-  const context = reactExports.useContext(CardValidationContext);
-  if (context === null) {
-    throw new Error(
-      "CardValidationContext must be used within a CardValidationProvider"
-    );
-  }
-  return context;
-};
 const DescriptionStyles = dt.p`
   font-size: 12px;
   color: #8b95a1;
@@ -19398,88 +19419,6 @@ const TitleStyles = dt.h2`
 `;
 function Title({ title }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(TitleStyles, { children: title });
-}
-const initialState = {
-  cardNumbers: {
-    first: "",
-    second: "",
-    third: "",
-    fourth: ""
-  },
-  expirationPeriod: {
-    month: "",
-    year: ""
-  },
-  cvcNumber: "",
-  cardCompany: CARD_COMPANY.none,
-  password: ""
-};
-const CardContext = reactExports.createContext(null);
-function CardProvider({ children }) {
-  const [cardNumbers, setCardNumbers] = reactExports.useState(
-    initialState.cardNumbers
-  );
-  const [expirationPeriod, setExpirationPeriod] = reactExports.useState(initialState.expirationPeriod);
-  const [cvcNumber, setCvcNumber] = reactExports.useState(
-    initialState.cvcNumber
-  );
-  const [cardCompany, setCardCompany] = reactExports.useState(
-    initialState.cardCompany
-  );
-  const [password, setPassword] = reactExports.useState(
-    initialState.password
-  );
-  const updateCardNumber = (value, position2) => {
-    setCardNumbers((prevNumbers) => ({
-      ...prevNumbers,
-      [position2]: value
-    }));
-  };
-  const updateExpirationPeriod = (value, position2) => {
-    setExpirationPeriod((prevExpirationPeriod) => ({
-      ...prevExpirationPeriod,
-      [position2]: value
-    }));
-  };
-  const isFieldFilled = (type) => {
-    switch (type) {
-      case CARD_FORM_TYPE.cardNumbers:
-        return isCardNumberFilled(cardNumbers);
-      case CARD_FORM_TYPE.expirationPeriod:
-        return isExpirationPeriodFilled(expirationPeriod);
-      case CARD_FORM_TYPE.cvcNumber:
-        return isCvcNumberFilled(cvcNumber);
-      case CARD_FORM_TYPE.cardCompany:
-        return isCardCompanySelected(cardCompany);
-      case CARD_FORM_TYPE.password:
-        return isPasswordFilled(password);
-      default:
-        return false;
-    }
-  };
-  const areAllFieldsFilled = () => {
-    return Object.values(CARD_FORM_TYPE).every((type) => isFieldFilled(type));
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    CardContext.Provider,
-    {
-      value: {
-        cardNumbers,
-        updateCardNumber,
-        expirationPeriod,
-        updateExpirationPeriod,
-        cvcNumber,
-        updateCvcNumber: setCvcNumber,
-        cardCompany,
-        updateCardCompany: setCardCompany,
-        password,
-        updatePassword: setPassword,
-        isFieldFilled,
-        areAllFieldsFilled
-      },
-      children
-    }
-  );
 }
 const useCard = () => {
   const context = reactExports.useContext(CardContext);
@@ -19526,7 +19465,6 @@ const CardFormFieldStyles = dt.div`
   display: flex;
   gap: 8px;
 `;
-const PLACEHOLDER = "카드사를 선택해 주세요";
 function CardCompanySelect() {
   const { cardCompany, updateCardCompany } = useCard();
   const { cardCompanyError, validateCardCompany } = useCardValidation();
@@ -19540,8 +19478,8 @@ function CardCompanySelect() {
     Select,
     {
       isError: cardCompanyError.hasError,
-      placeholder: PLACEHOLDER,
-      options: CARD_COMPANY_INFO$1,
+      placeholder: PLACEHOLDER.cardCompany,
+      options: CARD_COMPANY_INFO,
       value: cardCompany,
       onChange: handleCardCompanyChange,
       onBlur: handleCardCompanyChange,
@@ -19577,7 +19515,7 @@ function CardCvcInput() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(CardFormFieldStyles, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
     Input,
     {
-      placeholder: PLACEHOLDER$1.cvcNumber,
+      placeholder: PLACEHOLDER.cvcNumber,
       maxLength: MAX_LENGTH.cvcNumber,
       isError: cvcNumberError.hasError,
       value: cvcNumber,
@@ -19626,7 +19564,7 @@ const expirationPeriodSequence = [
 ];
 function CardExpirationPeriodInput() {
   const { expirationPeriod, updateExpirationPeriod } = useCard();
-  const { expirationPeriodErrors, validateExpirationPeriod } = useCardValidation();
+  const { expirationPeriodError, validateExpirationPeriod } = useCardValidation();
   const { registerRef, handleInputChange } = useFieldFocus(
     expirationPeriodSequence
   );
@@ -19639,9 +19577,9 @@ function CardExpirationPeriodInput() {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       Input,
       {
-        placeholder: PLACEHOLDER$1.expirationPeriod[position2],
+        placeholder: PLACEHOLDER.expirationPeriod[position2],
         maxLength: MAX_LENGTH.expirationPeriod,
-        isError: expirationPeriodErrors.hasError[position2],
+        isError: expirationPeriodError.hasError[position2],
         value: expirationPeriod[position2],
         onChange: (e) => handleExpirationPeriodChange(e.target.value, position2),
         onBlur: (e) => handleExpirationPeriodChange(e.target.value, position2),
@@ -19660,8 +19598,8 @@ const cardNumberSequence = [
   "cardNumber-fourth"
 ];
 function CardNumberInput() {
-  const { cardNumbers, updateCardNumber } = useCard();
-  const { cardNumberErrors, validateCardNumber } = useCardValidation();
+  const { cardNumber, updateCardNumber } = useCard();
+  const { cardNumberError, validateCardNumber } = useCardValidation();
   const { registerRef, handleInputChange } = useFieldFocus(cardNumberSequence);
   const handleCardNumberChange = (value, position2) => {
     validateCardNumber(value, position2);
@@ -19672,10 +19610,10 @@ function CardNumberInput() {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       Input,
       {
-        placeholder: PLACEHOLDER$1.cardNumber,
+        placeholder: PLACEHOLDER.cardNumber,
         maxLength: MAX_LENGTH.cardNumber,
-        isError: cardNumberErrors.hasError[position2],
-        value: cardNumbers[position2],
+        isError: cardNumberError.hasError[position2],
+        value: cardNumber[position2],
         onChange: (e) => handleCardNumberChange(e.target.value, position2),
         onBlur: (e) => handleCardNumberChange(e.target.value, position2),
         ref: (element) => registerRef(`cardNumber-${position2}`, element),
@@ -19696,7 +19634,7 @@ function CardPasswordInput() {
     Input,
     {
       type: "password",
-      placeholder: PLACEHOLDER$1.password,
+      placeholder: PLACEHOLDER.password,
       maxLength: MAX_LENGTH.password,
       isError: passwordError.hasError,
       value: password,
@@ -19711,21 +19649,21 @@ const CardFormSectionStyles = dt.div`
   margin-bottom: 40px;
 `;
 const titleVariants = {
-  [CARD_FORM_TYPE.cardNumbers]: "결제할 카드 번호를 입력해 주세요",
+  [CARD_FORM_TYPE.cardNumber]: "결제할 카드 번호를 입력해 주세요",
   [CARD_FORM_TYPE.expirationPeriod]: "카드 유효기간을 입력해 주세요",
   [CARD_FORM_TYPE.cvcNumber]: "CVC 번호를 입력해 주세요",
   [CARD_FORM_TYPE.cardCompany]: "카드사를 선택해 주세요",
   [CARD_FORM_TYPE.password]: "비밀번호를 입력해 주세요"
 };
 const descriptionVariants = {
-  [CARD_FORM_TYPE.cardNumbers]: "본인 명의의 카드만 결제 가능합니다.",
+  [CARD_FORM_TYPE.cardNumber]: "본인 명의의 카드만 결제 가능합니다.",
   [CARD_FORM_TYPE.expirationPeriod]: "월/년도(MMYY)를 순서대로 입력해 주세요.",
   [CARD_FORM_TYPE.cvcNumber]: null,
   [CARD_FORM_TYPE.cardCompany]: "현재 국내 카드사만 가능합니다.",
   [CARD_FORM_TYPE.password]: "앞의 2자리를 입력해주세요"
 };
 const subtitleVariants = {
-  [CARD_FORM_TYPE.cardNumbers]: "카드 번호",
+  [CARD_FORM_TYPE.cardNumber]: "카드 번호",
   [CARD_FORM_TYPE.expirationPeriod]: "유효기간",
   [CARD_FORM_TYPE.cvcNumber]: "CVC",
   [CARD_FORM_TYPE.cardCompany]: null,
@@ -19735,7 +19673,7 @@ function CardFormSection({ type }) {
   const { hasErrorByType, getErrorMessage } = useCardValidation();
   const renderCardFormFieldByType = () => {
     switch (type) {
-      case CARD_FORM_TYPE.cardNumbers:
+      case CARD_FORM_TYPE.cardNumber:
         return /* @__PURE__ */ jsxRuntimeExports.jsx(CardNumberInput, {});
       case CARD_FORM_TYPE.cardCompany:
         return /* @__PURE__ */ jsxRuntimeExports.jsx(CardCompanySelect, {});
@@ -19761,9 +19699,9 @@ function CardFormSection({ type }) {
     )
   ] });
 }
-const identifyCardType = (cardNumbers) => {
-  if (!isCardNumberFilled(cardNumbers)) return null;
-  const firstSegment = cardNumbers[CARD_NUMBERS_SEGMENT.first];
+const identifyCardType = (cardNumber) => {
+  if (!isCardNumberFilled(cardNumber)) return null;
+  const firstSegment = cardNumber[CARD_NUMBERS_SEGMENT.first];
   if (firstSegment.startsWith("4")) return CARD_TYPE.visa;
   if (/^5[1-5]/.test(firstSegment)) return CARD_TYPE.master;
   return null;
@@ -19832,24 +19770,24 @@ const CardTypeStyles = dt.div`
   right: 25px;
   top: 18px;
 `;
-const CardNumbersGroupStyles = dt.div`
+const CardNumberGroupStyles = dt.div`
   display: flex;
   gap: 7px;
 `;
 function CardPreview() {
-  const { cardNumbers, expirationPeriod, cardCompany } = useCard();
+  const { cardNumber, expirationPeriod, cardCompany } = useCard();
   const { hasErrorByType } = useCardValidation();
-  const cardType = identifyCardType(cardNumbers);
+  const cardType = identifyCardType(cardNumber);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(CardPreviewContainerStyles, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardPreviewStyles, { $cardCompany: cardCompany, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTopContainerStyles, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardICChipStyles, {}),
-      !hasErrorByType(CARD_FORM_TYPE.cardNumbers) && cardType !== null && /* @__PURE__ */ jsxRuntimeExports.jsx(CardTypeStyles, { $cardType: cardType })
+      !hasErrorByType(CARD_FORM_TYPE.cardNumber) && cardType !== null && /* @__PURE__ */ jsxRuntimeExports.jsx(CardTypeStyles, { $cardType: cardType })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardNumbersGroupStyles, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumbers.first }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumbers.second }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumbers.third && "*".repeat(cardNumbers.third.length) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumbers.fourth && "*".repeat(cardNumbers.fourth.length) })
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardNumberGroupStyles, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumber.first }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumber.second }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumber.third && "*".repeat(cardNumber.third.length) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: cardNumber.fourth && "*".repeat(cardNumber.fourth.length) })
     ] }),
     (expirationPeriod.month || expirationPeriod.year) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
       expirationPeriod.month,
@@ -19858,28 +19796,37 @@ function CardPreview() {
     ] })
   ] }) });
 }
-const CARD_COMPANY_INFO = {
-  "": "",
-  bc: "BC카드",
-  shinhan: "신한카드",
-  kakaobank: "카카오뱅크",
-  hyundai: "현대카드",
-  woori: "우리카드",
-  lotte: "롯데카드",
-  hana: "하나카드",
-  kb: "국민카드"
-};
+const ButtonStyles = dt.button`
+  width: 100%;
+  height: 55px;
+  background-color: #333333;
+  border-radius: 10px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.2s ease-out;
+
+  &:hover {
+    transform: scale(1.01);
+  }
+`;
+function Button({ text = "버튼", ...props }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ButtonStyles, { ...props, children: text });
+}
 function useCardSubmit() {
-  const { cardCompany, cardNumbers, areAllFieldsFilled } = useCard();
+  const { cardCompany, cardNumber, areAllFieldsFilled } = useCard();
   const { areAllFieldsValid } = useCardValidation();
   const navigate = useNavigate();
   const isFormComplete = areAllFieldsFilled() && areAllFieldsValid();
   const handleSubmit = (e) => {
     e.preventDefault();
+    const selectedCard = CARD_COMPANY_INFO.find(
+      (card) => card.value === cardCompany
+    );
     navigate("/register-complete", {
       state: {
-        cardFirstSegment: cardNumbers.first,
-        cardName: CARD_COMPANY_INFO[cardCompany]
+        cardFirstSegment: cardNumber.first,
+        cardName: selectedCard ? selectedCard.text : "카드"
       }
     });
   };
@@ -19889,80 +19836,43 @@ function useCardSubmit() {
   };
 }
 const formSequence = [
-  CARD_FORM_TYPE.cardNumbers,
+  CARD_FORM_TYPE.cardNumber,
   CARD_FORM_TYPE.cardCompany,
   CARD_FORM_TYPE.expirationPeriod,
   CARD_FORM_TYPE.cvcNumber,
   CARD_FORM_TYPE.password
 ];
-const initialVisibleState = {
-  [CARD_FORM_TYPE.cardNumbers]: true,
-  [CARD_FORM_TYPE.cardCompany]: false,
-  [CARD_FORM_TYPE.expirationPeriod]: false,
-  [CARD_FORM_TYPE.cvcNumber]: false,
-  [CARD_FORM_TYPE.password]: false
-};
-const initialFilledState = {
-  [CARD_FORM_TYPE.cardNumbers]: false,
+const initialState = {
+  [CARD_FORM_TYPE.cardNumber]: false,
   [CARD_FORM_TYPE.cardCompany]: false,
   [CARD_FORM_TYPE.expirationPeriod]: false,
   [CARD_FORM_TYPE.cvcNumber]: false,
   [CARD_FORM_TYPE.password]: false
 };
 function useSequentialForm() {
-  const [visibleFields, setVisibleFields] = reactExports.useState(initialVisibleState);
+  const [visibleFields, setVisibleFields] = reactExports.useState({ ...initialState, [CARD_FORM_TYPE.cardNumber]: true });
   const [currentField, setCurrentField] = reactExports.useState(
-    CARD_FORM_TYPE.cardNumbers
+    CARD_FORM_TYPE.cardNumber
   );
-  const filledState = reactExports.useRef(initialFilledState);
+  const filledState = reactExports.useRef(initialState);
   const { hasErrorByType } = useCardValidation();
   const { isFieldFilled } = useCard();
   const updateFieldCompletionState = (isFieldComplete) => {
-    switch (currentField) {
-      case CARD_FORM_TYPE.cardNumbers:
-        if (filledState.current[CARD_FORM_TYPE.cardNumbers] !== isFieldComplete) {
-          filledState.current[CARD_FORM_TYPE.cardNumbers] = isFieldComplete;
-          return true;
-        }
-        return false;
-      case CARD_FORM_TYPE.cardCompany:
-        if (filledState.current[CARD_FORM_TYPE.cardCompany] !== isFieldComplete) {
-          filledState.current[CARD_FORM_TYPE.cardCompany] = isFieldComplete;
-          return true;
-        }
-        return false;
-      case CARD_FORM_TYPE.expirationPeriod:
-        if (filledState.current[CARD_FORM_TYPE.expirationPeriod] !== isFieldComplete) {
-          filledState.current[CARD_FORM_TYPE.expirationPeriod] = isFieldComplete;
-          return true;
-        }
-        return false;
-      case CARD_FORM_TYPE.cvcNumber:
-        if (filledState.current[CARD_FORM_TYPE.cvcNumber] !== isFieldComplete) {
-          filledState.current[CARD_FORM_TYPE.cvcNumber] = isFieldComplete;
-          return true;
-        }
-        return false;
-      case CARD_FORM_TYPE.password:
-        if (filledState.current[CARD_FORM_TYPE.password] !== isFieldComplete) {
-          filledState.current[CARD_FORM_TYPE.password] = isFieldComplete;
-          return true;
-        }
-        return false;
-      default:
-        return false;
+    if (filledState.current[currentField] !== isFieldComplete) {
+      filledState.current[currentField] = isFieldComplete;
+      return true;
     }
+    return false;
   };
   const showNextField = () => {
     const currentIndex = formSequence.indexOf(currentField);
-    if (currentIndex < formSequence.length - 1) {
-      const nextField = formSequence[currentIndex + 1];
-      setVisibleFields((prev2) => ({
-        ...prev2,
-        [nextField]: true
-      }));
-      setCurrentField(nextField);
-    }
+    const nextField = formSequence[currentIndex + 1];
+    if (!nextField) return;
+    setVisibleFields((prev2) => ({
+      ...prev2,
+      [nextField]: true
+    }));
+    setCurrentField(nextField);
   };
   reactExports.useEffect(() => {
     const isFieldComplete = isFieldFilled(currentField) && !hasErrorByType(currentField);
@@ -19970,7 +19880,7 @@ function useSequentialForm() {
     if (isStateChanged && isFieldComplete) showNextField();
   }, [currentField, isFieldFilled, hasErrorByType]);
   const shouldShowField = (type) => visibleFields[type];
-  return shouldShowField;
+  return { shouldShowField };
 }
 const CardFormStyles = dt.form`
   margin: 0;
@@ -19985,7 +19895,7 @@ const CardFormScrollStyles = dt.div`
 `;
 function CardForm() {
   const { handleSubmit, isFormComplete } = useCardSubmit();
-  const shouldShowField = useSequentialForm();
+  const { shouldShowField } = useSequentialForm();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(CardFormStyles, { onSubmit: handleSubmit, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardPreview, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardFormScrollStyles, { children: [
@@ -19993,9 +19903,51 @@ function CardForm() {
       shouldShowField(CARD_FORM_TYPE.cvcNumber) && /* @__PURE__ */ jsxRuntimeExports.jsx(CardFormSection, { type: CARD_FORM_TYPE.cvcNumber }),
       shouldShowField(CARD_FORM_TYPE.expirationPeriod) && /* @__PURE__ */ jsxRuntimeExports.jsx(CardFormSection, { type: CARD_FORM_TYPE.expirationPeriod }),
       shouldShowField(CARD_FORM_TYPE.cardCompany) && /* @__PURE__ */ jsxRuntimeExports.jsx(CardFormSection, { type: CARD_FORM_TYPE.cardCompany }),
-      shouldShowField(CARD_FORM_TYPE.cardNumbers) && /* @__PURE__ */ jsxRuntimeExports.jsx(CardFormSection, { type: CARD_FORM_TYPE.cardNumbers })
+      shouldShowField(CARD_FORM_TYPE.cardNumber) && /* @__PURE__ */ jsxRuntimeExports.jsx(CardFormSection, { type: CARD_FORM_TYPE.cardNumber })
     ] }),
     isFormComplete && /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "submit", text: "확인" })
+  ] });
+}
+const RegisterCompleteStyles = dt.div`
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
+const CheckImgStyles = dt.img`
+  width: 100px;
+  height: 100px;
+`;
+const CompletionMessageStyles = dt.div`
+  text-align: center;
+  line-height: 1.5;
+`;
+const CompletionTitleStyles = dt.h1`
+  margin: 0;
+  padding: 0;
+`;
+function RegisterComplete() {
+  const { state } = useLocation();
+  const { cardFirstSegment, cardName } = state || {};
+  const handleConfirm = () => {
+    window.location.href = `${window.location.origin}${basePath}`;
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(RegisterCompleteStyles, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CheckImgStyles, { src: "./check.svg", alt: "check" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CompletionMessageStyles, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CompletionTitleStyles, { children: [
+        cardFirstSegment,
+        "로 시작하는"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CompletionTitleStyles, { children: [
+        cardName,
+        "가 등록되었어요."
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", text: "확인", onClick: handleConfirm })
   ] });
 }
 const GlobalStyles = ft`
@@ -20005,6 +19957,24 @@ const GlobalStyles = ft`
     margin: 0;
     padding: 0;
   }
+`;
+const ContainerStyles = dt.div`
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7f7f7;
+`;
+const WrapperStyles = dt.div`
+  display: flex;
+  flex-direction: column;
+  width: 28%;
+  height: 800px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
 `;
 function Layout() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ContainerStyles, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(WrapperStyles, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardValidationProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Outlet, {}) }) }) }) });
