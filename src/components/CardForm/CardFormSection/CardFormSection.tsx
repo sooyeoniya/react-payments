@@ -56,7 +56,7 @@ export default function CardFormSection({ type }: CardFormSectionProps) {
       case CARD_FORM_TYPE.password:
         return <CardPasswordInput />;
       default:
-        null;
+        return null;
     }
   };
 
