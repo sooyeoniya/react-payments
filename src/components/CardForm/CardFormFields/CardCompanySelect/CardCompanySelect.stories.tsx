@@ -4,7 +4,7 @@ import { withCustomCardProvider } from "../../../../../.storybook/utils/withCust
 import { withCustomCardValidationProvider } from "../../../../../.storybook/utils/withCustomCardValidationProvider";
 
 const meta = {
-  title: "CardCompanySelect",
+  title: "cardForm/cardFormFields/CardCompanySelect",
   component: CardCompanySelect,
   tags: ["autodocs"],
 } satisfies Meta<typeof CardCompanySelect>;

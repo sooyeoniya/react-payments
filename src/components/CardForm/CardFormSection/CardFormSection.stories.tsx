@@ -5,7 +5,7 @@ import { CARD_FORM_TYPE } from "../../../constants/card";
 import CardFormSection from "./CardFormSection";
 
 const meta = {
-  title: "CardFormSection",
+  title: "cardForm/CardFormSection",
   component: CardFormSection,
   tags: ["autodocs"],
 } satisfies Meta<typeof CardFormSection>;

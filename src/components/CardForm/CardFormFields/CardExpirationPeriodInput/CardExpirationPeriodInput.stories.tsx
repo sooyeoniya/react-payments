@@ -4,7 +4,7 @@ import { withCustomCardProvider } from "../../../../../.storybook/utils/withCust
 import { withCustomCardValidationProvider } from "../../../../../.storybook/utils/withCustomCardValidationProvider";
 
 const meta = {
-  title: "CardExpirationPeriodInput",
+  title: "cardForm/cardFormFields/CardExpirationPeriodInput",
   component: CardExpirationPeriodInput,
   tags: ["autodocs"],
 } satisfies Meta<typeof CardExpirationPeriodInput>;

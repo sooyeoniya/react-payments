@@ -4,7 +4,7 @@ import { withCustomCardProvider } from "../../../../../.storybook/utils/withCust
 import { withCustomCardValidationProvider } from "../../../../../.storybook/utils/withCustomCardValidationProvider";
 
 const meta = {
-  title: "CardNumberInput",
+  title: "cardForm/cardFormFields/CardNumberInput",
   component: CardNumberInput,
   tags: ["autodocs"],
 } satisfies Meta<typeof CardNumberInput>;

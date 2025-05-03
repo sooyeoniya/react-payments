@@ -3,7 +3,7 @@ import { CARD_COMPANY_INFO, PLACEHOLDER } from "../../../constants/card";
 import Select from "./Select";
 
 const meta = {
-  title: "Select",
+  title: "common/Select",
   component: Select,
   tags: ["autodocs"],
 } satisfies Meta<typeof Select>;

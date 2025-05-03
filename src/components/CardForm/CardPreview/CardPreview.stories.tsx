@@ -17,7 +17,7 @@ const defaultExpirationPeriod = {
 };
 
 const meta = {
-  title: "CardPreview",
+  title: "cardForm/CardPreview",
   component: CardPreview,
   tags: ["autodocs"],
 } satisfies Meta<typeof CardPreview>;

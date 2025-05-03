@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Subtitle from "./Subtitle";
 
 const meta = {
-  title: "Subtitle",
+  title: "common/Subtitle",
   component: Subtitle,
   tags: ["autodocs"],
 } satisfies Meta<typeof Subtitle>;
